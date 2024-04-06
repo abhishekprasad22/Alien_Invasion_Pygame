@@ -4,6 +4,7 @@ import pygame
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 
 class AlienInvasion:
@@ -30,6 +31,12 @@ class AlienInvasion:
 
         # Create a group to store bullets.
         self.bullets = pygame.sprite.Group()
+
+        # Create a group to hold the fleet of aliens
+        self.aliens = pygame.sprite.Group()
+
+        # Calls the below method
+        self._create_fleet()
 
         # Set the background colour
         self.bg_color = (230, 230, 230)
@@ -92,6 +99,12 @@ class AlienInvasion:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
 
+    def _create_fleet(self):
+        """Create the fleet of aliens."""
+        # Make the aliens.
+        alien = Alien(self)
+        self.aliens.add(alien) 
+
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen. """
         # Redraw the screen during each pass through the loop
@@ -103,6 +116,9 @@ class AlienInvasion:
         # Draw all bullets on the screen
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+
+        # Make the alien draw on the screen
+        self.aliens.draw(self.screen)
             
         # Make the most recently drawn screen visible.
         pygame.display.flip()
