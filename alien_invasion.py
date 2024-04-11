@@ -51,10 +51,6 @@ class AlienInvasion:
         # Make the play button
         self.play_button = Button(self, "Play")
 
-        # Set the background colour
-        self.bg_color = (230, 230, 230)
-
-
     def run_game(self):
         """Start the main loop for the game."""
         while True:
@@ -170,6 +166,30 @@ class AlienInvasion:
             self.stats.level += 1
             self.sb.prep_level()
 
+    def _update_aliens(self):
+        """
+        Check if the fleet is at an edge,
+        Update the positions of all aliens in the fleet.
+        """
+        self._check_fleet_edges()
+        self.aliens.update()
+
+        # Look for alien-sheep collision
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            self._ship_hit()
+
+        # Look for aliens hitting the bottom of the screen.
+        self._check_alien_bottom()
+
+    def _check_alien_bottom(self):
+        """Check if any aliens have reached the bottom of the screen."""
+        screen_rect = self.screen.get_rect()
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= screen_rect.bottom:
+                # Treat this as same as if the ship got hit.
+                self._ship_hit()
+                break
+
     def _ship_hit(self):
         """Respond to the ship being hit by an alien."""
         if self.stats.ship_left > 0:
@@ -191,30 +211,6 @@ class AlienInvasion:
             self.stats.game_active = False
             pygame.mouse.set_visible(True)
 
-    def _update_aliens(self):
-        """
-        Check if the fleet is at an edge,
-        Update the positions of all aliens on the fleet.
-        """
-        self._check_fleet_edges()
-        self.aliens.update()
-
-        # Look for alien-sheep collision
-        if pygame.sprite.spritecollideany(self.ship, self.aliens):
-            self._ship_hit()
-
-        # Look for aliens hitting the bottom of the screen.
-        self._check_alien_bottom()
-
-    def _check_alien_bottom(self):
-        """Check if any aliens have reached the bottom of the screen."""
-        screen_rect = self.screen.get_rect()
-        for alien in self.aliens.sprites():
-            if alien.rect.bottom >= screen_rect.bottom:
-                # Treat this as same as if the ship got hit.
-                self._ship_hit()
-                break
-            
     def _create_fleet(self):
         """Create the fleet of aliens."""
         # Create an alien and find the number of aliens in a row
@@ -237,7 +233,7 @@ class AlienInvasion:
                 self._create_alien(alien_number, row_number)
 
     def _create_alien(self, alien_number, row_number):
-        # Create an alien and place it in the row
+        """ Create an alien and place it in the row."""
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
         alien.x = alien_width + 2 * alien_width * alien_number
